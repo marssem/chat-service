@@ -1,0 +1,18 @@
+use chat
+
+# user1은 임시로 넣은 유저 아이디
+db.createCollection('user1');
+
+# collection에 넣을 때 사용하는 형식
+# db.user1.insert({"status":"question","date":"2022-07-04","word":"첫번째물음"});
+# db.user1.insert({"status":"answer","date":"2022-07-04","word":"첫번째답변"});
+
+db.createCollection('answer');
+
+# collection에 넣을 때 사용하는 형식
+# db.answer.insert({"question":"","answer":""});
+
+db.answer.insert({"question":"아이피샵은 어떤 서비스 인가요?","answer":"<p>아이피샵은 음악, 미술을 시작으로 다양한 문화예술분야의 무형자산에 대한 지식재산권(IP)을 거래할 수 있는 세계 최대 글로벌 지식재산권 거래 플랫폼입니다.</p><p><br></p><p>추후 동남아, 미국, 유럽 등 총 30개국 이상 진출을 목표로 하고 있습니다.</p><p><br></p><p>지식재산 창출 및 창작물에 대한 권리이익을 사용자와 함께 나눔과 동시에 창작 활동에 더 집중할 수 있는 환경을 조성하여, 더 좋은 창작물을 탄생시키게 하는 건강한 IP거래 문화 생태계를 이끌어 나가고자 합니다.</p>"});
+db.answer.insert({"question":"제휴문의는 어떻게 하나요?","answer":"<p>제휴 문의는 상단의 상품문의 – 제휴/광고문의를 통해 신청해주시면 빠른 답변을 드리겠습니다.<br></p>"});
+db.answer.insert({"question":"신용카드 또는 다른 결제 수단으로 결제할 수 없나요?","answer":"<p>현재 예치금 결제만 제공됩니다.</p><p>추후 다양한 결제 수단을 제공할 수 있도록 노력하겠습니다.</p>"});
+db.answer.insert({"question":"거래내역은 어디서 확인하나요?","answer":"<p>마이페이지 → 거래현황 을 눌러 확인하실 수 있습니다.<br></p>"});

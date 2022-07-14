@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat</title>
+    <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+
+    <main>
+        <ul class="container" id="chatContainer"></ul> 
+        <div class="question-box-wrap" id="questionBoxWrap"></div>
+        <form action="" method="post" onsubmit="return false;">
+            <input type="text" name="chat_text" id="chatTExt">
+            <input onclick="sendChat()" type="submit" value="send">
+        </form>
+    </main>
+
+    <script>
+
+        const chatContainer = document.getElementById('chatContainer');
+        window.addEventListener('load',function () {
+            fetch('/get')
+            .then(res=>res.json())
+            .then(result=>{
+
+                if(!result.length) {
+                    html = '';
+                    html += `<li class="right chat-item">아이피샵에 오신 것을 환영 합니다. 무엇이 궁금하신가요?</li>`;
+                    return chatContainer.innerHTML = html;
+                }
+
+                var html = '';
+                result.forEach(item => {
+                    if (Array.isArray(item.word) ) {
+                        html += '<li class="right chat-item">';
+                        html += '<p>혹시 이것을 찾으시나요?</p>';
+                        html += '<ul>';
+                        item.word.forEach(_item=>{
+                            html += `<li><a onclick="sendChat(this.innerText)" href="#none">${_item.question}</a></li><br/>`;
+                        })
+                        html += '</ul>';
+                        html += '|'+item.date;
+                        html += '</li>';
+                    }else{
+                        html += `<li class="${item.status === "question"?'left':'right'} chat-item">${item.word + ' | ' + item.date}</li>`;
+                    }
+                });
+                chatContainer.innerHTML = html;
+                showRecentChat();
+            })
+            .catch(err => {
+                console.error('Error : ',err);
+            })
+
+        });
+        window.addEventListener('load',function () {
+            fetch('/getQuestion')
+            .then(res=>res.json())
+            .then(result=>{
+                showSelectList(result);
+            })
+            .catch(err=>{
+                console.error(err);
+            })
+ 
+        });
+
+        function sendChat(text) {
+            const textInput = document.getElementById('chatTExt');
+            var data = { "word": text?text:textInput.value };
+            console.log(data);
+
+            fetch('/sendQuestion',{
+                method: 'POST',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json;charset=utf-8'},
+                body : JSON.stringify(data) ,
+            })
+            .then(res=>res.json())
+            .then(result=>{
+                if (result.answer === "none") {
+                    const liElement = document.createElement('li');
+                    liElement.className = 'left chat-item';
+                    liElement.innerHTML = result.question.word + ' | ' + result.question.date;
+                    chatContainer.appendChild(liElement); 
+                }else{
+                    console.log(result);
+
+                    const liElementQ = document.createElement('li');
+                    liElementQ.className = 'left chat-item';
+                    liElementQ.innerHTML = result.question.word + ' | ' + result.question.date;
+                    chatContainer.appendChild(liElementQ); 
+
+                    if ( Array.isArray(result.answer.word) ) {
+                        return showAnswerList(result.answer.word);
+                    }
+
+                    const liElementA = document.createElement('li');
+                    liElementA.className = 'right chat-item';
+                    liElementA.innerHTML = result.answer.word + ' | ' + result.answer.date;
+                    chatContainer.appendChild(liElementA); 
+                }
+                if (!text) {
+                    textInput.value = '';
+                }
+                showRecentChat();
+            })
+            .catch(err => {
+                console.error('Error : ',err);
+            })
+            
+        }
+        function showAnswerList(array) {
+            let html = '<li class="right chat-item">';
+            html += '<p>혹시 이것을 찾으시나요?</p>';
+            html += '<ul>';
+            array.forEach(item => {
+                html += `<li><a onclick="sendChat(this.innerText)" href="#none">${item.question}</a></li><br/>`;
+            });
+            html += '</ul>';
+            html += '</li>';
+            console.log(array);
+            chatContainer.insertAdjacentHTML('beforeEnd',html);
+            showRecentChat();
+        }
+
+        function selectQuestion() {
+            
+        }
+
+        function showSelectList(array) {
+            const container = document.getElementById('questionBoxWrap');
+            const element = document.createElement('ul');
+            let html = '';
+            array.forEach(item=>{
+                html += `<li><a onclick="sendChat(this.innerText)" href="#none">${item.question}</a></li><br>`;
+            })
+
+            element.className = 'question-box';
+            element.innerHTML = html;
+            container.appendChild(element);
+        }
+
+        function showRecentChat() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTo(0,container.scrollHeight);
+        }
+        
+    </script>
+    
+</body>
+</html>

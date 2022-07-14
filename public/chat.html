@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/index.css">
+<title>chatting</title>
+</head>
+<body>
+<main>
+<ul class="container" id="chatContainer"></ul> 
+<div class="question-box-wrap" id="questionBoxWrap"></div>
+<form action="" method="post" onsubmit="return false;">
+    <input type="text" name="chat_text" id="chatText">
+    <input onclick="sendChat()" type="submit" value="send">
+</form>
+</main>
+
+<script>
+// const ws = new WebSocket("ws://localhost:3000");
+// function sendChat() {
+//     ws.send("hello");
+//     console.log('is working!');
+    
+// }
+
+ // 웹소켓 전역 객체 생성
+var ws = new WebSocket("ws://localhost:3000");
+function getBrowserInfo() { 
+    var agent = navigator.userAgent.toUpperCase();
+    if (agent.indexOf('TRIDENT') >= 0) {        
+	return 'IE';
+    } else if (agent.indexOf('FIREFOX') >= 0) {        
+	return 'FIREFOX';
+	// Chrome과 Safari, Edge는 같이 웹킷을 사용한다. 역순으로 배치.    
+    } else if (agent.indexOf('EDG') >= 0) {        
+	return 'EDGE';
+    } else if (agent.indexOf('SAFARI') >= 0 && agent.indexOf('WINDOW') < 0) {        
+	return 'SAFARI';
+    } else if (agent.indexOf('CHROME') >= 0) {        
+	return 'CHROME';
+    } else {        
+	return '';
+    }
+}
+
+        // 연결이 수립되면 서버에 메시지를 전송한다
+        ws.onopen = function(event) {
+            let data = {'word':'채팅방에 입장하셨습니다.','user': getBrowserInfo()};
+
+            ws.send(JSON.stringify(data));
+            // ws.send("Client message: Hi!");
+        }
+
+        // 서버로 부터 메시지를 수신한다
+        ws.onmessage = function(event) {
+            showReceivedMessage(event.data,showRecentChat);
+            // console.log("Server message: ", event.data);
+        }
+
+        // error event handler
+        ws.onerror = function(event) {
+            console.log("Server error message: ", event.data);
+        }
+
+        function sendChat(text) {
+            const textInput = document.getElementById('chatText');
+            var data = { "word": text?text:textInput.value , "user" : getBrowserInfo()};
+            // ws.onopen = function (event) {}
+            console.log('send : ',JSON.stringify(data));
+            ws.send(JSON.stringify(data));
+            ws.onmessage = function (event) {
+                showReceivedMessage(event.data,showRecentChat);
+            }
+
+            ws.onerror = function(event) {
+                console.log("Server error message: ", event.data);
+            }
+
+            showRecentChat();
+            return;
+            
+        }
+        function showReceivedMessage(data,func) {
+            let result = JSON.parse(data);
+            console.log('result : ',result);
+            const liElement = document.createElement('li');
+            liElement.className = 'left chat-item';
+            liElement.innerHTML = result.data.word + ' | ' +  result.date + (result.data.user?`| write by : ${result.data.user}`:'') ;
+            console.log("event : ", event);
+            chatContainer.appendChild(liElement); 
+            func();
+        }
+
+        function showRecentChat() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTo(0,container.scrollHeight);
+        }
+    </script>
+</body>
+</html>
