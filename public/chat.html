@@ -45,58 +45,99 @@ function getBrowserInfo() {
     }
 }
 
-        // 연결이 수립되면 서버에 메시지를 전송한다
-        ws.onopen = function(event) {
-            let data = {'word':'채팅방에 입장하셨습니다.','user': getBrowserInfo()};
+    // 연결이 수립되면 서버에 메시지를 전송한다
+    ws.onopen = function(event) {
+        let data = {'word':'채팅방에 입장하셨습니다.','user': getBrowserInfo()};
 
-            ws.send(JSON.stringify(data));
-            // ws.send("Client message: Hi!");
+        ws.send(JSON.stringify(data));
+        // ws.send("Client message: Hi!");
+    }
+
+    // 서버로 부터 메시지를 수신한다
+    ws.onmessage = function(event) {
+        showReceivedMessage(event.data,showRecentChat);
+        // console.log("Server message: ", event.data);
+    }
+
+    // error event handler
+    ws.onerror = function(event) {
+        console.log("Server error message: ", event.data);
+    }
+
+    function sendChat(text) {
+        const textInput = document.getElementById('chatText');
+        var data = { "word": text?text:textInput.value , "user" : getBrowserInfo()};
+        // ws.onopen = function (event) {}
+        console.log('send : ',JSON.stringify(data));
+        ws.send(JSON.stringify(data));
+        ws.onmessage = function (event) {
+            showReceivedMessage(event.data,showRecentChat, data);
         }
 
-        // 서버로 부터 메시지를 수신한다
-        ws.onmessage = function(event) {
-            showReceivedMessage(event.data,showRecentChat);
-            // console.log("Server message: ", event.data);
-        }
-
-        // error event handler
         ws.onerror = function(event) {
             console.log("Server error message: ", event.data);
         }
 
-        function sendChat(text) {
-            const textInput = document.getElementById('chatText');
-            var data = { "word": text?text:textInput.value , "user" : getBrowserInfo()};
-            // ws.onopen = function (event) {}
-            console.log('send : ',JSON.stringify(data));
-            ws.send(JSON.stringify(data));
-            ws.onmessage = function (event) {
-                showReceivedMessage(event.data,showRecentChat);
-            }
-
-            ws.onerror = function(event) {
-                console.log("Server error message: ", event.data);
-            }
-
-            showRecentChat();
+        showRecentChat();
+        return;
+        
+    }
+    function showReceivedMessage(data,func, text) {
+        let result;
+        const liElement = document.createElement('li');
+        liElement.className = 'left chat-item';
+        try {
+            result = JSON.parse(data);
+        } catch (error) {
+            liElement.innerHTML = data;
+            chatContainer.appendChild(liElement); 
+            func();
             return;
-            
         }
-        function showReceivedMessage(data,func) {
-            let result = JSON.parse(data);
-            console.log('result : ',result);
-            const liElement = document.createElement('li');
-            liElement.className = 'left chat-item';
+        console.log('result : ',result);
+        if(Array.isArray(result) ){
+            result = result[0];
             liElement.innerHTML = result.data.word + ' | ' +  result.date + (result.data.user?`| write by : ${result.data.user}`:'') ;
             console.log("event : ", event);
             chatContainer.appendChild(liElement); 
             func();
+            return;
         }
+        if(result.acknowledged){
+            let date = new Date();
+            date = date.getFullYear().toString() 
+            + '-' 
+            + addOne(date.getMonth() + 1) 
+            + '-' 
+            + addOne(date.getDate()) 
+            + 'T'
+            + addOne(date.getHours()) 
+            + ':' 
+            + addOne(date.getMinutes()) 
+            + ':' 
+            + addOne(date.getSeconds());
 
-        function showRecentChat() {
-            const container = document.getElementById('chatContainer');
-            container.scrollTo(0,container.scrollHeight);
+            liElement.innerHTML = text.word + ' | ' + date + (text.user?`| write by : ${text.user}`:'') ;
+            // console.log("event : ", event);
+            chatContainer.appendChild(liElement); 
+            func();
         }
-    </script>
+    }
+
+    function showRecentChat() {
+        const container = document.getElementById('chatContainer');
+        container.scrollTo(0,container.scrollHeight);
+    }
+
+    // 숫자가 한 자리 수일 경우 앞에 0을 더해주는 함수
+    function addOne(params) {
+        var params = params.toString();
+        if(params.length === 1){
+            return '0'+params;
+        }
+        return params;
+    }
+
+</script>
 </body>
 </html>

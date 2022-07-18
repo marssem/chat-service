@@ -25,16 +25,16 @@ module.exports = {
 			const insertData = {
 				word : word,
 				date : date.getFullYear().toString() 
-						+ '-' 
-						+ addOne(date.getMonth() + 1) 
-						+ '-' 
-						+ addOne(date.getDate()) 
-						+ 'T'
-						+ addOne(date.getHours()) 
-						+ ':' 
-						+ addOne(date.getMinutes()) 
-						+ ':' 
-						+ addOne(date.getSeconds()),
+					+ '-' 
+					+ addOne(date.getMonth() + 1) 
+					+ '-' 
+					+ addOne(date.getDate()) 
+					+ 'T'
+					+ addOne(date.getHours()) 
+					+ ':' 
+					+ addOne(date.getMinutes()) 
+					+ ':' 
+					+ addOne(date.getSeconds()),
 				status : 'question'
 			}
 			var dbo = db.db("chat");
@@ -75,7 +75,6 @@ module.exports = {
 					insertQuestionAnswer(res, db, dbo, questionAndAnswerData);
 
 				}else{
-
 					dbo.collection("answer").find({question:{'$regex':question}}).toArray(function (_dberr, _dbres) {
 						if(_dberr) throw _dberr;
 						if ( _dbres.length > 0) {
@@ -94,6 +93,29 @@ module.exports = {
 			});
 		});
 	},
+	getTalk : function (client, str, user) {
+		MongoClient.connect(url, function(err, db) {
+			if (err) throw err;
+			let dbo = db.db("chat");
+			dbo.collection("talk").find({}).toArray(function (dberr, dbres) {
+				if (dberr) throw dberr;
+				console.log(dbres);
+				client.send(JSON.stringify(dbres) );
+				
+			});
+		})
+
+	},
+	fetchTalk : function (client,data,isBinary, user) {
+		MongoClient.connect(url, function(err, db) {
+			if (err) throw err;
+			let dbo = db.db("chat");
+			dbo.collection("talk").insertOne(JSON.parse(data), function (_err, result) {
+				// console.log(JSON.stringify(result));	
+                client.send(JSON.stringify(result),{binary:isBinary})
+			})
+		})
+	}
 
 } 
 
