@@ -58,7 +58,6 @@ function createChatItem(direct, text) {
 
 function showChatList(obj,createChatItem) {
     let container = document.querySelector('#chatContainer');
-    console.log(obj);
     for (let key in obj) {
         if(obj[key] === 'none') return;
         container.appendChild(createChatItem((obj[key].status==='answer'?'right':'left'),obj[key].word));
