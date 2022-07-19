@@ -46,7 +46,7 @@ module.exports = {
 		});
 		
 	},
-	getQuestion : function ( res) {
+	getQuestion : function (res) {
 		
 		MongoClient.connect(url, function(err, db) {
 			if (err) throw err;

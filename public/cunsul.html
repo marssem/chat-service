@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/room.css">
+    <script src="cunsul.js" defer></script>
+    <title>상담원 화면</title>
+</head>
+<body>
+   <main>
+        <div class="chat-container-wrap">
+            <ul class="chat-container" id="chatContainer">
+                <!-- <li class="chat-item left">
+                    <div class="chat-item-text">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                    </div>
+                </li>
+                <li class="chat-item right">
+                    <div class="chat-item-text">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Unde, aliquid.
+                    </div>
+                </li> -->
+            </ul>
+        </div>
+
+        <div class="change-button">
+            <button data-mode="consultant" onclick="return false;">연결 해제</button>
+        </div>
+        <form class="chat-input" onsubmit="sendForm(this); clearText(); return false;">
+            <input type="text" name="text" id="sendText">
+            <input type="submit" value="send">
+        </form>
+   </main> 
+</body>
+</html>

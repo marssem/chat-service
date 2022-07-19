@@ -9,23 +9,26 @@ wss.on("connection", (ws, req) =>{
     console.log('location : ', ws.location);
 
     wss.clients.forEach(client=>{
-        db.getTalk(client, `새로운 유저가 접속했습니다. ${wss.clients.size}`);
-        // client.send(`새로운 유저가 접속했습니다. ${wss.clients.size}`)
+        // db.getTalk(client, `새로운 유저가 접속했습니다. ${wss.clients.size}`);
+        client.send(`새로운 유저가 접속했습니다. ${wss.clients.size}`)
     })
 
     ws.on("message",(data, isBinary)=>{
+        console.log(data);
 
         wss.clients.forEach((client)=>{
             if(client.readyState === WebSocket.OPEN){
                 let date = getDate();
-                let str = `{"data" : ${data}, "date" :"${date}"}`;
-                console.log('==============================================================');
-                db.fetchTalk(client, str, isBinary);
-                // client.send(str,{binary:isBinary})
+                let obj = `${data}`;
+                obj = JSON.parse(`${data}`);
+                // console.log(modifiData(obj));
+                let str = JSON.stringify(modifiData(obj));
+                console.log(str);
+                // db.fetchTalk(client, str, isBinary);
+                client.send(str,{binary:isBinary})
             }
         })
     });
-
 
     ws.on("close", ()=>{
         wss.clients.forEach((client)=>{
@@ -35,21 +38,34 @@ wss.on("connection", (ws, req) =>{
 
 })
 
+function modifiData(obj) {
+    let result = new Object;
+    result.word = obj.word;
+    if(obj.status === 'consultant'){
+        result.status = 'answer';
+    }else{
+        result.status = 'question';
+    }
+    result.date = getDate();
+
+    return result;
+}
+
 // 현재 시간을 형식에 맞게 리턴하는 함수
 function getDate() {
     let date = new Date;
 
     return (
         date.getFullYear().toString() 
-        + '-' 
-        + addOne(date.getMonth() + 1) 
-        + '-' 
-        + addOne(date.getDate()) 
+        + '-'
+        + addOne(date.getMonth() + 1)
+        + '-'
+        + addOne(date.getDate())
         + 'T'
-        + addOne(date.getHours()) 
-        + ':' 
-        + addOne(date.getMinutes()) 
-        + ':' 
+        + addOne(date.getHours())
+        + ':'
+        + addOne(date.getMinutes())
+        + ':'
         + addOne(date.getSeconds())
     )
 }

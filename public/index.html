@@ -13,7 +13,7 @@
         <ul class="container" id="chatContainer"></ul> 
         <div class="question-box-wrap" id="questionBoxWrap"></div>
         <form action="" method="post" onsubmit="return false;">
-            <input type="text" name="chat_text" id="chatTExt">
+            <input type="text" name="chat_text" id="chatText">
             <input onclick="sendChat()" type="submit" value="send">
         </form>
     </main>
@@ -69,7 +69,7 @@
         });
 
         function sendChat(text) {
-            const textInput = document.getElementById('chatTExt');
+            const textInput = document.getElementById('chatText');
             var data = { "word": text?text:textInput.value };
             console.log(data);
 

@@ -56,6 +56,7 @@ function getBrowserInfo() {
     // 서버로 부터 메시지를 수신한다
     ws.onmessage = function(event) {
         showReceivedMessage(event.data,showRecentChat);
+            console.log('received message : ' ,event);
         // console.log("Server message: ", event.data);
     }
 
@@ -64,12 +65,14 @@ function getBrowserInfo() {
         console.log("Server error message: ", event.data);
     }
 
+
     function sendChat(text) {
         const textInput = document.getElementById('chatText');
         var data = { "word": text?text:textInput.value , "user" : getBrowserInfo()};
-        // ws.onopen = function (event) {}
         console.log('send : ',JSON.stringify(data));
+
         ws.send(JSON.stringify(data));
+
         ws.onmessage = function (event) {
             showReceivedMessage(event.data,showRecentChat, data);
         }
@@ -82,7 +85,7 @@ function getBrowserInfo() {
         return;
         
     }
-    function showReceivedMessage(data,func, text) {
+    function showReceivedMessage(data, func, text) {
         let result;
         const liElement = document.createElement('li');
         liElement.className = 'left chat-item';
@@ -121,7 +124,27 @@ function getBrowserInfo() {
             // console.log("event : ", event);
             chatContainer.appendChild(liElement); 
             func();
+            return;
         }
+
+        let date = new Date();
+        date = date.getFullYear().toString() 
+        + '-' 
+        + addOne(date.getMonth() + 1) 
+        + '-' 
+        + addOne(date.getDate()) 
+        + 'T'
+        + addOne(date.getHours()) 
+        + ':' 
+        + addOne(date.getMinutes()) 
+        + ':' 
+        + addOne(date.getSeconds());
+
+        liElement.innerHTML = result.data.word + ' | ' + date + (result.data.user?`| write by : ${result.data.user}`:'') ;
+        // console.log("event : ", event);
+        chatContainer.appendChild(liElement); 
+        func();
+
     }
 
     function showRecentChat() {
@@ -136,6 +159,10 @@ function getBrowserInfo() {
             return '0'+params;
         }
         return params;
+    }
+
+    function insertData() {
+        
     }
 
 </script>
